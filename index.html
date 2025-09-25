@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interativo - Gestão Integrada de Operações</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #question-container {
+            margin-bottom: 20px;
+        }
+
+        #question {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1em;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            outline: none;
+        }
+
+        .btn:hover:not([disabled]) {
+            background-color: #e9ecef;
+            border-color: #b1b9c1;
+        }
+
+        .btn.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .btn.wrong {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        
+        .btn.correct .rationale, .btn.wrong .rationale {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        #next-btn, #restart-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #next-btn:hover, #restart-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        #score-container {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        #progress-text {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Quiz: Gestão Integrada de Operações</h1>
+        
+        <div id="quiz-container">
+            <div id="progress-text"></div>
+            <div id="question-container">
+                <div id="question">Pergunta vai aqui</div>
+            </div>
+            <div id="answer-buttons" class="btn-grid">
+                </div>
+        </div>
+
+        <div id="score-container" class="hide">
+            <p id="score-text"></p>
+            <button id="restart-btn">Refazer o Quiz</button>
+        </div>
+        
+        <div class="controls">
+            <button id="next-btn" class="hide">Próxima Pergunta</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "Qual é a definição principal de Gestão de Operações?", answers: [ { text: "O gerenciamento exclusivo das finanças e do marketing de uma organização.", correct: false, rationale: "Incorreto. A gestão de operações se relaciona com finanças e marketing, mas seu foco principal não está nessas áreas." }, { text: "A gestão das atividades e processos que transformam insumos em produtos ou serviços.", correct: true, rationale: "Correto! Esta definição captura a essência da Gestão de Operações, focada na transformação de recursos em valor." }, { text: "A administração de recursos humanos, incluindo contratação e treinamento.", correct: false, rationale: "Incorreto. A gestão de pessoas é um insumo importante para as operações, mas não é a definição completa da área." }, { text: "O desenvolvimento de estratégias de vendas para alcançar novos mercados.", correct: false, rationale: "Incorreto. O desenvolvimento de estratégias de vendas é uma função primária da área de marketing." } ] },
+            { question: "Em um restaurante, os ingredientes, os cozinheiros e os equipamentos de cozinha são exemplos de qual componente do processo de transformação?", answers: [ { text: "Saídas (Outputs)", correct: false, rationale: "Incorreto. As saídas seriam as refeições prontas. Os ingredientes e cozinheiros são recursos." }, { text: "Processo de Transformação", correct: false, rationale: "Incorreto. O processo é a ação de cozinhar, não os recursos em si." }, { text: "Feedback", correct: false, rationale: "Incorreto. Feedback seria a opinião do cliente sobre a comida." }, { text: "Entradas (Inputs)", correct: true, rationale: "Correto! Estes são todos os recursos necessários que 'entram' no sistema para serem transformados." } ] },
+            { question: "Uma empresa de montagem de automóveis, que produz um grande volume de um produto padronizado, provavelmente utiliza qual tipo de arranjo físico (layout)?", answers: [ { text: "Layout por Processo (Funcional)", correct: false, rationale: "Incorreto. O layout por processo é para alta variedade e baixo volume." }, { text: "Layout Posicional (Fixo)", correct: false, rationale: "Incorreto. O layout posicional é usado quando o produto não se move, como um navio." }, { text: "Layout por Produto (Em Linha)", correct: true, rationale: "Correto! Este layout é ideal para a produção em massa e eficiente de um produto padronizado." }, { text: "Layout Celular", correct: false, rationale: "Incorreto. O layout celular é mais flexível, para famílias de produtos, não um único produto em massa." } ] },
+            { question: "A decisão de construir uma nova fábrica em outro país é uma decisão de qual natureza em operações?", answers: [ { text: "Tática, focada no controle de qualidade.", correct: false, rationale: "Incorreto. É uma decisão de longo prazo e alto impacto." }, { text: "Operacional, relacionada à programação diária.", correct: false, rationale: "Incorreto. Decisões operacionais são de curto prazo." }, { text: "Estratégica, relacionada à localização.", correct: true, rationale: "Correto! A localização é uma decisão estratégica chave, com impacto de longo prazo." }, { text: "Financeira, relacionada apenas ao fluxo de caixa.", correct: false, rationale: "Incorreto. Embora tenha impacto financeiro, é fundamentalmente uma decisão estratégica de operações." } ] },
+            { question: "O que é 'Capacidade Efetiva'?", answers: [ { text: "A produção máxima teórica que um sistema pode alcançar em condições ideais.", correct: false, rationale: "Incorreto. Essa é a definição de 'Capacidade de Projeto'." }, { text: "A produção máxima esperada, considerando restrições como manutenção, pausas e perdas.", correct: true, rationale: "Correto! Capacidade efetiva é uma medida realista que considera as paradas planejadas." }, { text: "A capacidade real de produção que foi alcançada em um determinado dia.", correct: false, rationale: "Incorreto. Isso é a produção real, não a capacidade." }, { text: "A capacidade de produção dos concorrentes diretos no mercado.", correct: false, rationale: "Incorreto. A capacidade dos concorrentes não define a capacidade da sua empresa." } ] },
+            { question: "A construção de um grande navio cargueiro é um exemplo que demanda qual tipo de arranjo físico?", answers: [ { text: "Layout por Produto", correct: false, rationale: "Incorreto. O produto não se move numa linha de montagem." }, { text: "Layout Posicional", correct: true, rationale: "Correto! O produto (navio) fica parado, e os recursos se movem até ele." }, { text: "Layout Celular", correct: false, rationale: "Incorreto. O layout celular não é adequado para projetos únicos de grande escala." }, { text: "Layout por Processo", correct: false, rationale: "Incorreto. O layout por processo não seria eficiente para um projeto tão grande e centralizado." } ] },
+            { question: "Uma equipe produziu 400 unidades de um produto utilizando 80 horas de trabalho. Qual é a produtividade da mão de obra?", answers: [ { text: "0,2 unidades por hora", correct: false, rationale: "Incorreto. Você dividiu a entrada pela saída. A fórmula é Saídas / Entradas." }, { text: "480 unidades por hora", correct: false, rationale: "Cálculo incorreto. Verifique a operação matemática." }, { text: "5 unidades por hora", correct: true, rationale: "Correto! Produtividade = 400 unidades / 80 horas = 5 unidades por hora." }, { text: "3200 unidades por hora", correct: false, rationale: "Cálculo incorreto. Você multiplicou os valores." } ] },
+            { question: "Se uma empresa tinha como meta produzir 100 peças e produziu 95, podemos dizer que ela foi:", answers: [ { text: "100% eficiente, mas não foi eficaz.", correct: false, rationale: "Incorreto. A eficiência não pode ser determinada, e a eficácia não foi de 100%." }, { text: "95% eficaz.", correct: true, rationale: "Correto! Eficácia é o grau de atingimento das metas (95/100)." }, { text: "95% eficiente.", correct: false, rationale: "Incorreto. Eficiência compara a produção com a capacidade, não com a meta." }, { text: "Ineficaz e ineficiente.", correct: false, rationale: "Incorreto. Atingir 95% da meta é ser bastante eficaz." } ] },
+            { question: "Uma fábrica utiliza muitos recursos para produzir pouco, desperdiçando matéria-prima e energia. Este é um problema primariamente de:", answers: [ { text: "Falta de eficácia.", correct: false, rationale: "Incorreto. A empresa pode estar atingindo as metas (eficaz), mas de forma custosa." }, { text: "Falta de produtividade.", correct: false, rationale: "Incorreto. A baixa produtividade é uma consequência, mas não a causa raiz do problema." }, { text: "Baixa capacidade de projeto.", correct: false, rationale: "Incorreto. O problema está no uso dos recursos, não na capacidade máxima teórica." }, { text: "Falta de eficiência.", correct: true, rationale: "Correto! Eficiência é sobre fazer as coisas da maneira certa, com o mínimo de desperdício." } ] },
+            { question: "O que a produtividade multifatorial busca medir?", answers: [ { text: "A relação entre as saídas e um único tipo de entrada, como a mão de obra.", correct: false, rationale: "Incorreto. Isso descreve a produtividade de fator único." }, { text: "A relação entre as saídas totais e um conjunto de várias entradas combinadas.", correct: true, rationale: "Correto! A produtividade multifatorial oferece uma visão mais completa do desempenho, considerando vários recursos." }, { text: "A quantidade de produtos defeituosos em relação à produção total.", correct: false, rationale: "Incorreto. Isso é um indicador de qualidade." }, { text: "A satisfação do cliente em relação aos produtos ou serviços oferecidos.", correct: false, rationale: "Incorreto. Isso é um indicador de satisfação, não de produtividade." } ] },
+            { question: "Qual é o principal objetivo da Gestão da Cadeia de Suprimentos (SCM)?", answers: [ { text: "Minimizar o preço de compra dos materiais, independentemente da qualidade.", correct: false, rationale: "Incorreto. O SCM busca o melhor valor total, considerando qualidade, entrega e custo." }, { text: "Gerenciar e integrar o fluxo de materiais, informações e finanças desde o fornecedor inicial até o cliente final.", correct: true, rationale: "Correto! Essa é a visão completa e integrada que define o SCM." }, { text: "Focar exclusivamente na logística de transporte e armazenamento dos produtos acabados.", correct: false, rationale: "Incorreto. SCM é muito mais amplo que apenas a logística de saída." }, { text: "Aumentar a produção interna da fábrica a qualquer custo.", correct: false, rationale: "Incorreto. O SCM busca o equilíbrio e a eficiência de toda a cadeia, não apenas da produção." } ] },
+            { question: "O Mapeamento do Fluxo de Valor (VSM) é uma ferramenta utilizada principalmente para:", answers: [ { text: "Definir o preço final de venda dos produtos.", correct: false, rationale: "Incorreto. O VSM é uma ferramenta de melhoria de processos, não de precificação." }, { text: "Analisar o balanço financeiro da empresa.", correct: false, rationale: "Incorreto. O VSM é uma ferramenta de análise operacional." }, { text: "Visualizar todo o fluxo de produção, identificar gargalos e atividades que não agregam valor.", correct: true, rationale: "Correto! O VSM ajuda a 'enxergar' o processo para identificar e eliminar desperdícios." }, { text: "Realizar pesquisas de satisfação com os clientes.", correct: false, rationale: "Incorreto. O VSM é uma ferramenta de análise de processos internos e da cadeia de valor." } ] },
+            { question: "Na cadeia de suprimentos, o fluxo de informações geralmente se move em qual direção?", answers: [ { text: "Apenas do cliente para o fornecedor (upstream).", correct: false, rationale: "Incorreto. Informações como faturas e status de envio fluem no sentido contrário." }, { text: "Apenas do fornecedor para o cliente (downstream).", correct: false, rationale: "Incorreto. Informações cruciais como pedidos e previsões de demanda fluem do cliente para o fornecedor." }, { text: "Em ambas as direções (upstream e downstream).", correct: true, rationale: "Correto! A comunicação é bidirecional: pedidos e demandas vão 'para cima' na cadeia, enquanto produtos e informações de status vão 'para baixo'." }, { text: "A informação não flui, apenas os materiais.", correct: false, rationale: "Incorreto. O fluxo de informação é tão vital quanto o fluxo de materiais." } ] },
+            { question: "A seleção e o desenvolvimento de parcerias de longo prazo com bons fornecedores são atividades centrais de qual área?", answers: [ { text: "Gestão da Produção", correct: false, rationale: "Incorreto. A gestão da produção é mais focada nos processos internos." }, { text: "Logística de Distribuição", correct: false, rationale: "Incorreto. A logística de distribuição foca na entrega ao cliente final." }, { text: "Gestão da Cadeia de Suprimentos (SCM)", correct: true, rationale: "Correto! O SCM envolve o gerenciamento estratégico das relações com todos os elos da cadeia, incluindo fornecedores." }, { text: "Controle de Qualidade", correct: false, rationale: "Incorreto. Embora a qualidade do fornecedor seja importante, a gestão da relação é uma atividade de SCM." } ] },
+            { question: "A finalidade principal da Análise da Curva ABC na gestão de estoques é:", answers: [ { text: "Calcular o custo total de transporte de todos os itens.", correct: false, rationale: "Incorreto. A Curva ABC não está relacionada a custos de transporte." }, { text: "Organizar os itens fisicamente no armazém por ordem alfabética.", correct: false, rationale: "Incorreto. O 'ABC' refere-se a uma classificação de valor, não alfabética." }, { text: "Determinar o ponto de pedido exato para cada item do estoque.", correct: false, rationale: "Incorreto. A análise ajuda a decidir o nível de controle, mas não calcula o ponto de pedido em si." }, { text: "Classificar os itens de estoque por importância, aplicando um controle mais rigoroso nos itens de maior valor.", correct: true, rationale: "Correto! A Curva ABC é uma ferramenta de priorização baseada no princípio de Pareto (80/20)." } ] },
+            { question: "Em uma loja de eletrônicos, os smartphones de última geração seriam classificados em qual categoria da Curva ABC?", answers: [ { text: "Classe A", correct: true, rationale: "Correto! Representam alto valor monetário e necessitam de controle rigoroso." }, { text: "Classe B", correct: false, rationale: "Incorreto. Itens da Classe B têm importância intermediária." }, { text: "Classe C", correct: false, rationale: "Incorreto. Itens da Classe C são de baixo valor e grande volume, como cabos e capas simples." }, { text: "Classe D", correct: false, rationale: "Incorreto. A classificação padrão é A, B e C." } ] },
+            { question: "Qual dos seguintes é um motivo válido para uma empresa manter estoques?", answers: [ { text: "Para aumentar o capital imobilizado e reduzir a liquidez.", correct: false, rationale: "Incorreto. Aumento do capital imobilizado é uma desvantagem, não um motivo." }, { text: "Para se proteger contra incertezas na demanda e no tempo de entrega.", correct: true, rationale: "Correto! O estoque de segurança atua como uma proteção contra a variabilidade, evitando a falta de produtos." }, { text: "Para ocupar o máximo de espaço possível no armazém.", correct: false, rationale: "Incorreto. Ocupar espaço gera custos; o objetivo é otimizá-lo." }, { text: "Para garantir que os produtos se tornem obsoletos.", correct: false, rationale: "Incorreto. A obsolescência é um risco e um custo do estoque, não um objetivo." } ] },
+            { question: "Um sistema de ressuprimento que dispara um novo pedido sempre que o nível de estoque atinge um ponto específico é chamado de:", answers: [ { text: "Modelo de Revisão Periódica", correct: false, rationale: "Incorreto. O modelo de revisão periódica é baseado em intervalos de tempo fixos." }, { text: "Modelo de Ponto de Pedido (ROP)", correct: true, rationale: "Correto! O gatilho para a ação neste modelo é um 'nível' ou 'ponto' de estoque." }, { text: "Curva ABC", correct: false, rationale: "Incorreto. A Curva ABC é uma ferramenta de classificação de estoque." }, { text: "Logística Reversa", correct: false, rationale: "Incorreto. Logística reversa é o fluxo de produtos do cliente para a empresa." } ] },
+            { question: "Ao escolher um modal de transporte para produtos de altíssimo valor e urgentes, qual critério é o mais importante?", answers: [ { text: "Custo", correct: false, rationale: "Incorreto. Para itens urgentes, o custo é secundário em relação à velocidade." }, { text: "Capacidade de Carga", correct: false, rationale: "Incorreto. Itens de alto valor geralmente não são transportados em grandes volumes." }, { text: "Velocidade e Confiabilidade", correct: true, rationale: "Correto! A rapidez e a certeza da entrega são essenciais para produtos urgentes ou de alto valor." }, { text: "Disponibilidade em áreas remotas", correct: false, rationale: "Incorreto. Embora seja um fator, a velocidade é o critério principal neste cenário." } ] },
+            { question: "A coordenação de todas as atividades logísticas para otimizar o fluxo de produtos é o conceito de:", answers: [ { text: "Gestão de Marketing", correct: false, rationale: "Incorreto. Marketing foca na demanda, não na entrega física." }, { text: "Logística Integrada", correct: true, rationale: "Correto! Este conceito descreve a visão sistêmica da logística, onde todas as partes trabalham juntas." }, { text: "Engenharia de Produção", correct: false, rationale: "Incorreto. Engenharia de produção foca nos processos de fabricação." }, { text: "Contabilidade de Custos", correct: false, rationale: "Incorreto. A contabilidade mede os custos, mas não gerencia as atividades." } ] },
+            { question: "Uma oficina mecânica que possui áreas separadas para troca de óleo, reparo de motores e alinhamento está organizada com qual tipo de layout?", answers: [ { text: "Layout por Produto", correct: false, rationale: "Incorreto. Cada carro (produto) recebe um serviço diferente, não seguindo uma linha única." }, { text: "Layout Posicional", correct: false, rationale: "Incorreto. O carro se move entre as estações de serviço." }, { text: "Layout por Processo (Funcional)", correct: true, rationale: "Correto! As estações de trabalho estão agrupadas por tipo de serviço ou função." }, { text: "Layout Fixo", correct: false, rationale: "Incorreto. Este é outro nome para o Layout Posicional." } ] },
+            { question: "Uma empresa estabeleceu uma meta de responder a 95% dos e-mails de clientes em até 24 horas. Ao final do mês, ela atingiu 98%. Este resultado demonstra alta:", answers: [ { text: "Eficácia", correct: true, rationale: "Correto! A empresa superou a meta estabelecida, demonstrando ser eficaz em cumprir seus objetivos." }, { text: "Eficiência", correct: false, rationale: "Incorreto. Não temos informações sobre os recursos utilizados para saber se foi eficiente." }, { text: "Produtividade", correct: false, rationale: "Incorreto. Não temos dados sobre os 'inputs' (ex: número de atendentes) para calcular a produtividade." }, { text: "Capacidade", correct: false, rationale: "Incorreto. A capacidade seria o número máximo de e-mails que eles poderiam responder, não a meta." } ] },
+            { question: "A prática de ter fornecedores entregando componentes diretamente na linha de montagem, no momento exato em que são necessários, é um princípio central do sistema:", answers: [ { text: "Just-in-Time (JIT)", correct: true, rationale: "Correto! O JIT busca eliminar estoques intermediários, sincronizando a entrega de materiais com a produção." }, { text: "Planejamento Mestre de Produção (MPS)", correct: false, rationale: "Incorreto. O MPS é uma ferramenta de planejamento de alto nível, mas não descreve essa prática específica." }, { text: "Controle Estatístico de Processo (CEP)", correct: false, rationale: "Incorreto. O CEP é uma ferramenta de controle de qualidade." }, { text: "Manutenção Preditiva", correct: false, rationale: "Incorreto. A manutenção preditiva foca em prever falhas de equipamentos." } ] },
+            { question: "A principal vantagem de um layout celular é:", answers: [ { text: "Ser o mais barato de implementar.", correct: false, rationale: "Incorreto. A implementação pode ser complexa e exigir investimento em equipamentos flexíveis." }, { text: "Maximizar a utilização de equipamentos específicos.", correct: false, rationale: "Incorreto. O layout por processo geralmente maximiza a utilização de equipamentos específicos." }, { text: "Combinar a eficiência da linha de produção com a flexibilidade do layout por processo.", correct: true, rationale: "Correto! Ele oferece um bom equilíbrio, permitindo a produção eficiente de famílias de produtos variados." }, { text: "Ser ideal para produtos que não podem ser movidos.", correct: false, rationale: "Incorreto. Esse é o layout posicional." } ] },
+            { question: "O que é o 'Efeito Chicote' (Bullwhip Effect) na cadeia de suprimentos?", answers: [ { text: "O aumento da eficiência à medida que os produtos se aproximam do cliente final.", correct: false, rationale: "Incorreto. O efeito chicote geralmente descreve um problema de ineficiência." }, { text: "A redução dos custos de transporte devido à consolidação de cargas.", correct: false, rationale: "Incorreto. Isso é um objetivo da logística, não o Efeito Chicote." }, { text: "A tendência de pequenas variações na demanda do cliente final se amplificarem à medida que se movem para trás na cadeia de suprimentos.", correct: true, rationale: "Correto! Isso leva a grandes oscilações nos pedidos de estoque e produção para fornecedores e fabricantes." }, { text: "A melhoria contínua dos processos em toda a cadeia de suprimentos.", correct: false, rationale: "Incorreto. A melhoria contínua é um objetivo, enquanto o Efeito Chicote é um problema a ser resolvido." } ] },
+            { question: "Em uma análise de produtividade, se a produção de uma fábrica aumentou 10% enquanto as horas trabalhadas aumentaram 5%, pode-se afirmar que:", answers: [ { text: "A produtividade da mão de obra diminuiu.", correct: false, rationale: "Incorreto. A produção cresceu mais do que o recurso utilizado." }, { text: "A produtividade da mão de obra permaneceu a mesma.", correct: false, rationale: "Incorreto. As taxas de crescimento são diferentes." }, { text: "A produtividade da mão de obra aumentou.", correct: true, rationale: "Correto! Como o aumento nas saídas (10%) foi maior que o aumento na entrada (5%), a razão entre eles (produtividade) aumentou." }, { text: "Não há dados suficientes para analisar a produtividade.", correct: false, rationale: "Incorreto. Temos os dados percentuais necessários para essa análise comparativa." } ] },
+            { question: "Qual dos seguintes é considerado um CUSTO de manutenção de estoque?", answers: [ { text: "Custo de transporte do fornecedor para o armazém.", correct: false, rationale: "Isso é um custo de aquisição ou de pedido, não de manutenção." }, { text: "Custo de oportunidade do capital empatado nos produtos.", correct: true, rationale: "Correto! O dinheiro preso em estoque poderia estar rendendo juros ou sendo investido em outro lugar, gerando um custo de oportunidade." }, { text: "Salário do gerente de compras.", correct: false, rationale: "Isso é um custo administrativo ou de aquisição, não diretamente ligado à manutenção do estoque." }, { text: "Desconto por volume obtido na compra.", correct: false, rationale: "Isso é um benefício da compra, que pode levar a um aumento de estoque, mas não é um custo de mantê-lo." } ] },
+            { question: "Para uma empresa que fabrica produtos de alto volume e baixa variedade, como parafusos, a decisão estratégica de localização será mais influenciada por:", answers: [ { text: "Proximidade de universidades e centros de pesquisa.", correct: false, rationale: "Isso é mais crítico para indústrias de alta tecnologia ou P&D." }, { text: "Custos de mão de obra, logística e matéria-prima.", correct: true, rationale: "Correto! Em mercados de commodities e alto volume, a minimização dos custos é o fator dominante para a competitividade." }, { text: "Proximidade de lojas de varejo de luxo.", correct: false, rationale: "A localização de varejo de luxo é irrelevante para uma fábrica de parafusos." }, { text: "Facilidade de acesso para clientes finais visitarem a fábrica.", correct: false, rationale: "Indústrias B2B de alto volume raramente precisam se preocupar com o acesso de clientes finais à sua planta." } ] },
+            { question: "O processo de devolução de produtos por clientes, seja por defeito ou fim de vida útil, é gerenciado pela:", answers: [ { text: "Logística de Entrada (Inbound Logistics)", correct: false, rationale: "Incorreto. Logística de entrada lida com o recebimento de materiais dos fornecedores." }, { text: "Logística Reversa", correct: true, rationale: "Correto! A logística reversa gerencia o fluxo de produtos no sentido contrário ao tradicional, do consumidor de volta para a empresa." }, { text: "Gestão de Inventário", correct: false, rationale: "Incorreto. A gestão de inventário lida com o estoque, mas a logística reversa é o processo específico de retorno." }, { text: "Gestão de Compras", correct: false, rationale: "Incorreto. Compras trata da aquisição de novos materiais e serviços." } ] },
+            { question: "Uma empresa decide parar de fabricar um componente e passar a comprá-lo de um fornecedor especializado. Esta é uma decisão de:", answers: [ { text: "Layout", correct: false, rationale: "Incorreto. Layout refere-se ao arranjo físico interno." }, { text: "Terceirização (Outsourcing)", correct: true, rationale: "Correto! Terceirização é o ato de contratar uma empresa externa para realizar tarefas que antes eram feitas internamente." }, { text: "Integração Vertical", correct: false, rationale: "Incorreto. Integração vertical é o oposto, é quando a empresa decide produzir internamente o que antes comprava." }, { text: "Benchmarking", correct: false, rationale: "Incorreto. Benchmarking é o processo de comparar suas práticas com as dos melhores do mercado." } ] }
+        ];
+
+        const questionElement = document.getElementById('question');
+        const answerButtonsElement = document.getElementById('answer-buttons');
+        const nextButton = document.getElementById('next-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const scoreContainer = document.getElementById('score-container');
+        const scoreText = document.getElementById('score-text');
+        const restartButton = document.getElementById('restart-btn');
+        const progressText = document.getElementById('progress-text');
+        
+        let shuffledQuestions, currentQuestionIndex, score;
+
+        function startGame() {
+            shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreContainer.classList.add('hide');
+            quizContainer.classList.remove('hide');
+            nextButton.classList.add('hide');
+            setNextQuestion();
+        }
+
+        function setNextQuestion() {
+            resetState();
+            showQuestion(shuffledQuestions[currentQuestionIndex]);
+        }
+
+        function showQuestion(question) {
+            progressText.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
+            questionElement.innerText = question.question;
+            question.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.innerText = answer.text;
+                button.classList.add('btn');
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct;
+                }
+                button.dataset.rationale = answer.rationale;
+                button.addEventListener('click', selectAnswer);
+                answerButtonsElement.appendChild(button);
+            });
+        }
+
+        function resetState() {
+            clearStatusClass(document.body);
+            nextButton.classList.add('hide');
+            while (answerButtonsElement.firstChild) {
+                answerButtonsElement.removeChild(answerButtonsElement.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            const selectedButton = e.target;
+            const correct = selectedButton.dataset.correct === "true";
+
+            if (correct) {
+                score++;
+            }
+
+            Array.from(answerButtonsElement.children).forEach(button => {
+                setStatusClass(button, button.dataset.correct === "true");
+                button.disabled = true;
+                const rationaleText = document.createElement('span');
+                rationaleText.classList.add('rationale');
+                rationaleText.innerText = button.dataset.rationale;
+                button.appendChild(rationaleText);
+            });
+
+            if (shuffledQuestions.length > currentQuestionIndex + 1) {
+                nextButton.classList.remove('hide');
+            } else {
+                showScore();
+            }
+        }
+
+        function setStatusClass(element, correct) {
+            clearStatusClass(element);
+            if (correct) {
+                element.classList.add('correct');
+            } else {
+                element.classList.add('wrong');
+            }
+        }
+
+        function clearStatusClass(element) {
+            element.classList.remove('correct');
+            element.classList.remove('wrong');
+        }
+
+        function handleNextButtonClick() {
+            currentQuestionIndex++;
+            setNextQuestion();
+        }
+
+        function showScore() {
+            quizContainer.classList.add('hide');
+            nextButton.classList.add('hide');
+            scoreContainer.classList.remove('hide');
+            const percentage = Math.round((score / questions.length) * 100);
+            scoreText.innerHTML = `Você acertou ${score} de ${questions.length} perguntas! (${percentage}%)`;
+        }
+        
+        nextButton.addEventListener('click', handleNextButtonClick);
+        restartButton.addEventListener('click', startGame);
+
+        startGame();
+    </script>
+
+</body>
+</html>
