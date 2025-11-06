@@ -1,297 +1,565 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Interativo - Gestão Integrada de Operações</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .container {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 700px;
-            padding: 30px;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: #0056b3;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-
-        #question-container {
-            margin-bottom: 20px;
-        }
-
-        #question {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-
-        .btn {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 1em;
-            text-align: left;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-            outline: none;
-        }
-
-        .btn:hover:not([disabled]) {
-            background-color: #e9ecef;
-            border-color: #b1b9c1;
-        }
-
-        .btn.correct {
-            background-color: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-        }
-
-        .btn.wrong {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
-        }
-        
-        .btn.correct .rationale, .btn.wrong .rationale {
-            display: block;
-            margin-top: 10px;
-            font-size: 0.9em;
-            font-style: italic;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-        
-        #next-btn, #restart-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        #next-btn:hover, #restart-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .hide {
-            display: none;
-        }
-
-        #score-container {
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        #progress-text {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-    </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz de Gestão Integradora de Operações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- React via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel to transpile JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
 </head>
-<body>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+      const { useState, useMemo } = React;
 
-    <div class="container">
-        <h1>Quiz: Gestão Integrada de Operações</h1>
-        
-        <div id="quiz-container">
-            <div id="progress-text"></div>
-            <div id="question-container">
-                <div id="question">Pergunta vai aqui</div>
+      // Data do Quiz
+      const QUIZ_QUESTIONS = [
+        // Tecnologia aplicada às operações
+        {
+            questionText: "Qual é a principal função de um sistema ERP (Enterprise Resource Planning) em uma organização?",
+            options: [
+                "Gerenciar campanhas de marketing digital.",
+                "Integrar e gerenciar os principais processos de negócio em um único sistema.",
+                "Desenvolver software personalizado para a equipe de vendas.",
+                "Controlar o acesso físico às instalações da empresa."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Um sistema ERP integra áreas como finanças, manufatura, SCM, RH e vendas, fornecendo uma fonte única de dados e otimizando os processos de negócio."
+        },
+        {
+            questionText: "Qual das seguintes tecnologias é um pilar fundamental da Indústria 4.0?",
+            options: [
+                "Máquina a vapor",
+                "Linha de montagem",
+                "Internet das Coisas (IoT)",
+                "Telefone analógico"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A Indústria 4.0 é caracterizada pela digitalização e integração de tecnologias como IoT, IA, Big Data e computação em nuvem para criar 'fábricas inteligentes'."
+        },
+        {
+            questionText: "Como a Internet das Coisas (IoT) contribui significativamente para a gestão de operações?",
+            options: [
+                "Aumentando o uso de papel em relatórios.",
+                "Permitindo que funcionários usem redes sociais no trabalho.",
+                "Coletando dados em tempo real de sensores em máquinas para monitoramento e manutenção.",
+                "Facilitando a comunicação por e-mail entre departamentos."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A IoT permite a coleta contínua de dados de equipamentos e produtos, o que é crucial para a manutenção preditiva, otimização de processos e rastreabilidade."
+        },
+        {
+            questionText: "Na Indústria 4.0, o que é um 'Gêmeo Digital' (Digital Twin)?",
+            options: [
+                "Um funcionário que substitui outro durante as férias.",
+                "Uma cópia de segurança de todos os arquivos da empresa.",
+                "Uma réplica virtual de um processo ou produto físico para simulação e análise.",
+                "Um segundo monitor para o computador do gerente de produção."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Um Gêmeo Digital é um modelo virtual que espelha um objeto ou sistema físico. Ele é usado para simular cenários, prever falhas e otimizar o desempenho sem impactar a operação real."
+        },
+        {
+            questionText: "O objetivo principal da Gestão da Cadeia de Suprimentos (SCM) é:",
+            options: [
+                "Maximizar o estoque de produtos acabados.",
+                "Negociar o menor preço possível com fornecedores, independentemente da qualidade.",
+                "Otimizar o fluxo de materiais, informações e finanças do fornecedor ao cliente final.",
+                "Gerenciar apenas o transporte de mercadorias da fábrica para o cliente."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "O SCM abrange todo o ciclo de vida do produto, desde a aquisição de matéria-prima até a entrega ao consumidor, buscando eficiência, agilidade e colaboração entre todos os elos da cadeia."
+        },
+        // Inteligência artificial, Dados e Qualidade
+        {
+            questionText: "Qual é o princípio central da metodologia Lean Manufacturing (Manufatura Enxuta)?",
+            options: [
+                "Aumentar a produção a qualquer custo.",
+                "Implementar o máximo de tecnologia possível.",
+                "Eliminar sistematicamente os desperdícios em todos os processos.",
+                "Manter grandes estoques de segurança."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "O Lean foca em agregar valor para o cliente eliminando atividades que não agregam valor, conhecidas como desperdícios (Muda), como espera, transporte desnecessário e superprodução."
+        },
+        {
+            questionText: "O objetivo principal da metodologia Seis Sigma (Six Sigma) é:",
+            options: [
+                "Aumentar a flexibilidade do processo para permitir mais variações.",
+                "Reduzir a variabilidade e os defeitos nos processos a um nível próximo de zero.",
+                "Focar apenas na velocidade da produção, ignorando a qualidade.",
+                "Implementar um novo sistema de software."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Seis Sigma é uma metodologia disciplinada e baseada em dados que visa atingir um nível de qualidade de 99,99966% de perfeição, ou seja, no máximo 3,4 defeitos por milhão de oportunidades."
+        },
+        {
+            questionText: "A Gestão da Qualidade Total (TQM - Total Quality Management) enfatiza:",
+            options: [
+                "A responsabilidade pela qualidade é exclusiva de um único departamento.",
+                "O envolvimento de todos os colaboradores na melhoria contínua da qualidade.",
+                "A inspeção do produto apenas no final do processo de produção.",
+                "Atingir a qualidade mínima aceitável pelo menor custo."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "TQM é uma filosofia de gestão que envolve toda a organização, desde a alta administração até o chão de fábrica, em um esforço contínuo para melhorar processos e satisfazer os clientes."
+        },
+        {
+            questionText: "A certificação ISO 9001 está relacionada a qual aspecto de uma organização?",
+            options: [
+                "Gestão Ambiental.",
+                "Segurança da Informação.",
+                "Sistema de Gestão da Qualidade.",
+                "Saúde e Segurança Ocupacional."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A ISO 9001 é a norma internacional para Sistemas de Gestão da Qualidade (SGQ), que ajuda as organizações a garantir que seus produtos e serviços atendam consistentemente aos requisitos dos clientes."
+        },
+        {
+            questionText: "Como a análise de Big Data apoia as decisões operacionais?",
+            options: [
+                "Tornando o processo de decisão mais lento e complexo.",
+                "Substituindo completamente a necessidade de gerentes experientes.",
+                "Baseando as decisões em intuição e suposições.",
+                "Identificando padrões em grandes volumes de dados para prever demandas e otimizar processos."
+            ],
+            correctAnswerIndex: 3,
+            explanation: "O Big Data permite analisar enormes conjuntos de dados para descobrir insights valiosos, como padrões de consumo, previsão de falhas em equipamentos e otimização da cadeia de suprimentos."
+        },
+        {
+            questionText: "Qual é uma aplicação prática da Inteligência Artificial (IA) na Gestão da Cadeia de Suprimentos?",
+            options: [
+                "Preenchimento manual de planilhas de estoque.",
+                "Otimização de rotas de entrega em tempo real para economizar combustível e tempo.",
+                "Impressão de etiquetas de remessa.",
+                "Agendamento de reuniões da equipe de logística."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "A IA pode analisar variáveis como tráfego, clima e prioridades de entrega em tempo real para calcular as rotas mais eficientes, um problema complexo para o planejamento manual."
+        },
+        {
+            questionText: "No ciclo PDCA, a letra 'A' (de Act ou Agir) representa qual etapa?",
+            options: [
+                "Analisar o problema inicial.",
+                "Aprovar o plano de ação.",
+                "Agir corretivamente sobre os desvios e padronizar os acertos.",
+                "Abandonar o projeto se os resultados forem negativos."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A etapa 'Act' (Agir) envolve a implementação de ações corretivas se os resultados não foram os esperados, ou a padronização do processo se a melhoria foi bem-sucedida, para garantir que ela seja mantida."
+        },
+        // Gestão de manutenção e confiabilidade operacional
+        {
+            questionText: "Qual a principal diferença entre manutenção preventiva e preditiva?",
+            options: [
+                "Preventiva corrige falhas, preditiva as previne.",
+                "Preventiva é baseada em tempo/uso; Preditiva é baseada na condição real do equipamento.",
+                "Não há diferença, são a mesma coisa.",
+                "Preditiva é mais barata, mas menos eficaz que a preventiva."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "A manutenção preventiva segue um cronograma fixo (ex: trocar óleo a cada 10.000 km). A preditiva usa monitoramento (ex: análise de vibração) para intervir apenas quando necessário, otimizando recursos."
+        },
+        {
+            questionText: "A manutenção corretiva é realizada:",
+            options: [
+                "Antes de qualquer falha ocorrer.",
+                "De acordo com um cronograma pré-definido.",
+                "Apenas após a ocorrência de uma falha ou quebra.",
+                "Com base em previsões de software de IA."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A manutenção corretiva é reativa. Ela acontece para consertar um equipamento que já falhou. Pode ser planejada (falha não crítica) ou não planejada (parada de emergência)."
+        },
+        {
+            questionText: "O indicador MTBF (Mean Time Between Failures) mede:",
+            options: [
+                "O tempo médio para consertar um equipamento.",
+                "O número total de falhas em um ano.",
+                "O tempo médio que um equipamento opera sem apresentar falhas.",
+                "O custo médio de uma falha."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "MTBF é um indicador chave de confiabilidade. Um MTBF alto significa que o equipamento é confiável e falha com pouca frequência."
+        },
+        {
+            questionText: "O que o indicador MTTR (Mean Time To Repair) representa?",
+            options: [
+                "O tempo médio entre as falhas de um equipamento.",
+                "A meta de tempo para a próxima manutenção.",
+                "O tempo médio necessário para reparar um equipamento após uma falha.",
+                "O tempo total de máquina parada em um mês."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "MTTR é um indicador de manutenibilidade. Um MTTR baixo indica que a equipe de manutenção é eficiente e consegue colocar o equipamento de volta em operação rapidamente."
+        },
+        {
+            questionText: "A integração eficaz entre a manutenção e o planejamento da produção visa principalmente:",
+            options: [
+                "Aumentar o número de paradas para manutenção.",
+                "Reduzir o orçamento do departamento de manutenção.",
+                "Garantir que a manutenção trabalhe de forma isolada.",
+                "Reduzir paradas não programadas e maximizar a disponibilidade dos ativos."
+            ],
+            correctAnswerIndex: 3,
+            explanation: "Alinhar o planejamento da manutenção com o da produção permite programar intervenções em momentos de menor impacto, evitando paradas que comprometam as entregas e a eficiência."
+        },
+        {
+            questionText: "Qual tipo de tecnologia é comumente associado à manutenção preditiva?",
+            options: [
+                "Chaves de fenda e martelos.",
+                "Planilhas de controle manual.",
+                "Sensores de vibração, termografia e análise de óleo.",
+                "Calendários e agendas de papel."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A manutenção preditiva depende de tecnologias de monitoramento de condição para detectar sinais precoces de desgaste ou falha, como aumento de temperatura, vibração anormal ou contaminação no óleo."
+        },
+        // Planejamento agregado e programação da produção
+        {
+            questionText: "Qual o foco principal do Planejamento Agregado da Produção (PAP)?",
+            options: [
+                "Definir a tarefa de cada operador no dia a dia.",
+                "Alinhar a capacidade de produção com a demanda prevista a médio prazo (3 a 18 meses).",
+                "Comprar matéria-prima para a produção da próxima semana.",
+                "Fazer o balanço financeiro da empresa."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "O PAP lida com decisões de nível tático, como níveis de produção, mão de obra e estoque, de forma agregada (por família de produtos) para equilibrar oferta e demanda a médio prazo."
+        },
+        {
+            questionText: "Qual a função do Plano Mestre de Produção (MPS - Master Production Schedule)?",
+            options: [
+                "Listar todos os fornecedores da empresa.",
+                "Servir como um plano de marketing.",
+                "Especificar quais produtos finais serão produzidos, em que quantidade e quando.",
+                "Controlar as horas trabalhadas de cada funcionário."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "O MPS desagrega o Plano Agregado e serve como a principal entrada para o sistema MRP. Ele representa o compromisso da produção em fabricar itens específicos em datas específicas."
+        },
+        {
+            questionText: "Manter altos níveis de estoque gera um trade-off com:",
+            options: [
+                "A melhoria do atendimento ao cliente.",
+                "A redução do risco de obsolescência.",
+                "A diminuição da necessidade de espaço físico.",
+                "O aumento dos custos de armazenagem e capital imobilizado."
+            ],
+            correctAnswerIndex: 3,
+            explanation: "Embora estoques altos possam prevenir a falta de produtos, eles incorrem em custos significativos de armazenagem, seguro, perdas e o custo de oportunidade do dinheiro que está 'parado' em estoque."
+        },
+        {
+            questionText: "No planejamento agregado, uma estratégia de 'perseguição' (chase strategy) implica em:",
+            options: [
+                "Manter a produção constante e usar o estoque para absorver variações da demanda.",
+                "Variar a taxa de produção para acompanhar exatamente as flutuações da demanda.",
+                "Terceirizar toda a produção.",
+                "Ignorar a demanda e produzir o máximo possível."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "A estratégia de perseguição ajusta a força de trabalho (contratando/demitindo) ou o ritmo de produção (horas extras) para espelhar a demanda, mantendo o estoque baixo."
+        },
+        {
+            questionText: "O sistema MRP (Material Requirements Planning) é usado para:",
+            options: [
+                "Gerenciar os recursos humanos da empresa.",
+                "Planejar as necessidades de transporte e distribuição.",
+                "Calcular a necessidade de materiais e componentes para atender ao plano mestre.",
+                "Fazer a previsão de vendas de longo prazo."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A partir do MPS, o MRP 'explode' a lista de materiais (BOM) para calcular exatamente quando e quanto comprar ou produzir de cada componente, evitando faltas ou excessos."
+        },
+        {
+            questionText: "O que é um 'gargalo' (bottleneck) em um processo de produção?",
+            options: [
+                "A etapa mais rápida e eficiente do processo.",
+                "Qualquer máquina que esteja em manutenção.",
+                "A etapa do processo com a menor capacidade, que limita a produção total.",
+                "O local onde os produtos acabados são armazenados."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "A capacidade de todo o sistema de produção é ditada pela capacidade de seu gargalo. Gerenciar e otimizar o gargalo é crucial para aumentar a produção geral (Teoria das Restrições)."
+        },
+        {
+            questionText: "O modelo de Lote Econômico de Compra (LEC ou EOQ) busca determinar:",
+            options: [
+                "O preço mais baixo para um item.",
+                "O melhor fornecedor do mercado.",
+                "A quantidade ótima a ser comprada para minimizar os custos totais de pedido e de armazenagem.",
+                "A data exata de entrega de um pedido."
+            ],
+            correctAnswerIndex: 2,
+            explanation: "O modelo EOQ encontra o equilíbrio perfeito: comprar em lotes grandes reduz o custo de fazer pedidos, mas aumenta o custo de armazenagem. O EOQ calcula a quantidade que minimiza a soma desses dois custos."
+        },
+        {
+            questionText: "O que é 'lead time' em um contexto de operações?",
+            options: [
+                "O tempo que o líder da equipe leva para aprovar uma decisão.",
+                "O tempo total decorrido desde o início de um processo (ex: um pedido) até a sua conclusão.",
+                "O tempo de duração de uma reunião de planejamento.",
+                "A primeira hora de um turno de produção."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "O Lead Time é um fator crítico no planejamento. Pode se referir ao tempo de entrega de um fornecedor, ao tempo de fabricação de um produto ou ao tempo total para atender ao pedido de um cliente."
+        },
+        {
+            questionText: "O sistema de estoque 'Just-in-Time' (JIT) visa principalmente:",
+            options: [
+                "Ter sempre um grande estoque para emergências.",
+                "Receber materiais e produzir bens apenas quando são necessários.",
+                "Fazer as compras de matéria-prima uma vez por ano.",
+                "Simplificar o processo de contagem de estoque."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "O JIT é uma filosofia que busca a eficiência máxima ao reduzir o estoque ao mínimo. Isso exige alta confiabilidade de fornecedores e processos internos muito bem ajustados."
+        },
+        {
+            questionText: "Qual dos seguintes itens é considerado um dos 8 desperdícios (Muda) do Lean?",
+            options: [
+                "Treinamento de funcionários",
+                "Manutenção preventiva",
+                "Excesso de processamento",
+                "Satisfação do cliente"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "Excesso de processamento significa fazer mais trabalho do que o necessário (ex: polir uma peça que não será visível). Os 8 desperdícios são: Defeitos, Superprodução, Espera, Transporte, Estoque, Movimentação, Excesso de Processamento e Talento não utilizado."
+        },
+        {
+            questionText: "A confiabilidade operacional pode ser definida como:",
+            options: [
+                "A velocidade máxima que um equipamento pode atingir.",
+                "A probabilidade de um sistema funcionar conforme o esperado por um período de tempo.",
+                "O quão amigável é a interface de um software de gestão.",
+                "A confiança que os funcionários têm em seus gestores."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "Confiabilidade é uma medida de desempenho que quantifica a capacidade de um sistema de operar sem falhas sob condições estabelecidas por um determinado período. É fundamental para a estabilidade da produção."
+        },
+        {
+            questionText: "O que melhor descreve a automação de processos (RPA - Robotic Process Automation)?",
+            options: [
+                "Robôs físicos que montam produtos em uma linha de produção.",
+                "Software ('robôs') que imitam ações humanas para executar tarefas repetitivas em sistemas digitais.",
+                "Um sistema de segurança com câmeras e alarmes automatizados.",
+                "Um programa de computador que joga xadrez."
+            ],
+            correctAnswerIndex: 1,
+            explanation: "RPA é usado para automatizar tarefas de escritório baseadas em regras, como preencher formulários, copiar e colar dados e processar transações, liberando os humanos para atividades de maior valor."
+        }
+    ];
+
+      // Component from components/ProgressBar.tsx
+      const ProgressBar = ({ current, total }) => {
+        const progressPercentage = (current / total) * 100;
+
+        return (
+          <div className="w-full space-y-2">
+            <p className="text-sm font-medium text-gray-400 text-center">
+              Pergunta {current} de {total}
+            </p>
+            <div className="w-full bg-gray-700 rounded-full h-2.5">
+              <div
+                className="bg-cyan-500 h-2.5 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
             </div>
-            <div id="answer-buttons" class="btn-grid">
-                </div>
-        </div>
+          </div>
+        );
+      };
 
-        <div id="score-container" class="hide">
-            <p id="score-text"></p>
-            <button id="restart-btn">Refazer o Quiz</button>
-        </div>
-        
-        <div class="controls">
-            <button id="next-btn" class="hide">Próxima Pergunta</button>
-        </div>
-    </div>
+      // Component from components/QuestionCard.tsx
+      const QuestionCard = ({
+        question,
+        selectedAnswerIndex,
+        isAnswered,
+        isCorrect,
+        onAnswerSelect,
+      }) => {
+        const getButtonClass = (index) => {
+          if (!isAnswered) {
+            return 'bg-gray-700 hover:bg-cyan-700/50 border-gray-600 hover:border-cyan-500';
+          }
+          
+          const isCorrectAnswer = index === question.correctAnswerIndex;
+          const isSelectedAnswer = index === selectedAnswerIndex;
 
-    <script>
-        const questions = [
-            { question: "Qual é a definição principal de Gestão de Operações?", answers: [ { text: "O gerenciamento exclusivo das finanças e do marketing de uma organização.", correct: false, rationale: "Incorreto. A gestão de operações se relaciona com finanças e marketing, mas seu foco principal não está nessas áreas." }, { text: "A gestão das atividades e processos que transformam insumos em produtos ou serviços.", correct: true, rationale: "Correto! Esta definição captura a essência da Gestão de Operações, focada na transformação de recursos em valor." }, { text: "A administração de recursos humanos, incluindo contratação e treinamento.", correct: false, rationale: "Incorreto. A gestão de pessoas é um insumo importante para as operações, mas não é a definição completa da área." }, { text: "O desenvolvimento de estratégias de vendas para alcançar novos mercados.", correct: false, rationale: "Incorreto. O desenvolvimento de estratégias de vendas é uma função primária da área de marketing." } ] },
-            { question: "Em um restaurante, os ingredientes, os cozinheiros e os equipamentos de cozinha são exemplos de qual componente do processo de transformação?", answers: [ { text: "Saídas (Outputs)", correct: false, rationale: "Incorreto. As saídas seriam as refeições prontas. Os ingredientes e cozinheiros são recursos." }, { text: "Processo de Transformação", correct: false, rationale: "Incorreto. O processo é a ação de cozinhar, não os recursos em si." }, { text: "Feedback", correct: false, rationale: "Incorreto. Feedback seria a opinião do cliente sobre a comida." }, { text: "Entradas (Inputs)", correct: true, rationale: "Correto! Estes são todos os recursos necessários que 'entram' no sistema para serem transformados." } ] },
-            { question: "Uma empresa de montagem de automóveis, que produz um grande volume de um produto padronizado, provavelmente utiliza qual tipo de arranjo físico (layout)?", answers: [ { text: "Layout por Processo (Funcional)", correct: false, rationale: "Incorreto. O layout por processo é para alta variedade e baixo volume." }, { text: "Layout Posicional (Fixo)", correct: false, rationale: "Incorreto. O layout posicional é usado quando o produto não se move, como um navio." }, { text: "Layout por Produto (Em Linha)", correct: true, rationale: "Correto! Este layout é ideal para a produção em massa e eficiente de um produto padronizado." }, { text: "Layout Celular", correct: false, rationale: "Incorreto. O layout celular é mais flexível, para famílias de produtos, não um único produto em massa." } ] },
-            { question: "A decisão de construir uma nova fábrica em outro país é uma decisão de qual natureza em operações?", answers: [ { text: "Tática, focada no controle de qualidade.", correct: false, rationale: "Incorreto. É uma decisão de longo prazo e alto impacto." }, { text: "Operacional, relacionada à programação diária.", correct: false, rationale: "Incorreto. Decisões operacionais são de curto prazo." }, { text: "Estratégica, relacionada à localização.", correct: true, rationale: "Correto! A localização é uma decisão estratégica chave, com impacto de longo prazo." }, { text: "Financeira, relacionada apenas ao fluxo de caixa.", correct: false, rationale: "Incorreto. Embora tenha impacto financeiro, é fundamentalmente uma decisão estratégica de operações." } ] },
-            { question: "O que é 'Capacidade Efetiva'?", answers: [ { text: "A produção máxima teórica que um sistema pode alcançar em condições ideais.", correct: false, rationale: "Incorreto. Essa é a definição de 'Capacidade de Projeto'." }, { text: "A produção máxima esperada, considerando restrições como manutenção, pausas e perdas.", correct: true, rationale: "Correto! Capacidade efetiva é uma medida realista que considera as paradas planejadas." }, { text: "A capacidade real de produção que foi alcançada em um determinado dia.", correct: false, rationale: "Incorreto. Isso é a produção real, não a capacidade." }, { text: "A capacidade de produção dos concorrentes diretos no mercado.", correct: false, rationale: "Incorreto. A capacidade dos concorrentes não define a capacidade da sua empresa." } ] },
-            { question: "A construção de um grande navio cargueiro é um exemplo que demanda qual tipo de arranjo físico?", answers: [ { text: "Layout por Produto", correct: false, rationale: "Incorreto. O produto não se move numa linha de montagem." }, { text: "Layout Posicional", correct: true, rationale: "Correto! O produto (navio) fica parado, e os recursos se movem até ele." }, { text: "Layout Celular", correct: false, rationale: "Incorreto. O layout celular não é adequado para projetos únicos de grande escala." }, { text: "Layout por Processo", correct: false, rationale: "Incorreto. O layout por processo não seria eficiente para um projeto tão grande e centralizado." } ] },
-            { question: "Uma equipe produziu 400 unidades de um produto utilizando 80 horas de trabalho. Qual é a produtividade da mão de obra?", answers: [ { text: "0,2 unidades por hora", correct: false, rationale: "Incorreto. Você dividiu a entrada pela saída. A fórmula é Saídas / Entradas." }, { text: "480 unidades por hora", correct: false, rationale: "Cálculo incorreto. Verifique a operação matemática." }, { text: "5 unidades por hora", correct: true, rationale: "Correto! Produtividade = 400 unidades / 80 horas = 5 unidades por hora." }, { text: "3200 unidades por hora", correct: false, rationale: "Cálculo incorreto. Você multiplicou os valores." } ] },
-            { question: "Se uma empresa tinha como meta produzir 100 peças e produziu 95, podemos dizer que ela foi:", answers: [ { text: "100% eficiente, mas não foi eficaz.", correct: false, rationale: "Incorreto. A eficiência não pode ser determinada, e a eficácia não foi de 100%." }, { text: "95% eficaz.", correct: true, rationale: "Correto! Eficácia é o grau de atingimento das metas (95/100)." }, { text: "95% eficiente.", correct: false, rationale: "Incorreto. Eficiência compara a produção com a capacidade, não com a meta." }, { text: "Ineficaz e ineficiente.", correct: false, rationale: "Incorreto. Atingir 95% da meta é ser bastante eficaz." } ] },
-            { question: "Uma fábrica utiliza muitos recursos para produzir pouco, desperdiçando matéria-prima e energia. Este é um problema primariamente de:", answers: [ { text: "Falta de eficácia.", correct: false, rationale: "Incorreto. A empresa pode estar atingindo as metas (eficaz), mas de forma custosa." }, { text: "Falta de produtividade.", correct: false, rationale: "Incorreto. A baixa produtividade é uma consequência, mas não a causa raiz do problema." }, { text: "Baixa capacidade de projeto.", correct: false, rationale: "Incorreto. O problema está no uso dos recursos, não na capacidade máxima teórica." }, { text: "Falta de eficiência.", correct: true, rationale: "Correto! Eficiência é sobre fazer as coisas da maneira certa, com o mínimo de desperdício." } ] },
-            { question: "O que a produtividade multifatorial busca medir?", answers: [ { text: "A relação entre as saídas e um único tipo de entrada, como a mão de obra.", correct: false, rationale: "Incorreto. Isso descreve a produtividade de fator único." }, { text: "A relação entre as saídas totais e um conjunto de várias entradas combinadas.", correct: true, rationale: "Correto! A produtividade multifatorial oferece uma visão mais completa do desempenho, considerando vários recursos." }, { text: "A quantidade de produtos defeituosos em relação à produção total.", correct: false, rationale: "Incorreto. Isso é um indicador de qualidade." }, { text: "A satisfação do cliente em relação aos produtos ou serviços oferecidos.", correct: false, rationale: "Incorreto. Isso é um indicador de satisfação, não de produtividade." } ] },
-            { question: "Qual é o principal objetivo da Gestão da Cadeia de Suprimentos (SCM)?", answers: [ { text: "Minimizar o preço de compra dos materiais, independentemente da qualidade.", correct: false, rationale: "Incorreto. O SCM busca o melhor valor total, considerando qualidade, entrega e custo." }, { text: "Gerenciar e integrar o fluxo de materiais, informações e finanças desde o fornecedor inicial até o cliente final.", correct: true, rationale: "Correto! Essa é a visão completa e integrada que define o SCM." }, { text: "Focar exclusivamente na logística de transporte e armazenamento dos produtos acabados.", correct: false, rationale: "Incorreto. SCM é muito mais amplo que apenas a logística de saída." }, { text: "Aumentar a produção interna da fábrica a qualquer custo.", correct: false, rationale: "Incorreto. O SCM busca o equilíbrio e a eficiência de toda a cadeia, não apenas da produção." } ] },
-            { question: "O Mapeamento do Fluxo de Valor (VSM) é uma ferramenta utilizada principalmente para:", answers: [ { text: "Definir o preço final de venda dos produtos.", correct: false, rationale: "Incorreto. O VSM é uma ferramenta de melhoria de processos, não de precificação." }, { text: "Analisar o balanço financeiro da empresa.", correct: false, rationale: "Incorreto. O VSM é uma ferramenta de análise operacional." }, { text: "Visualizar todo o fluxo de produção, identificar gargalos e atividades que não agregam valor.", correct: true, rationale: "Correto! O VSM ajuda a 'enxergar' o processo para identificar e eliminar desperdícios." }, { text: "Realizar pesquisas de satisfação com os clientes.", correct: false, rationale: "Incorreto. O VSM é uma ferramenta de análise de processos internos e da cadeia de valor." } ] },
-            { question: "Na cadeia de suprimentos, o fluxo de informações geralmente se move em qual direção?", answers: [ { text: "Apenas do cliente para o fornecedor (upstream).", correct: false, rationale: "Incorreto. Informações como faturas e status de envio fluem no sentido contrário." }, { text: "Apenas do fornecedor para o cliente (downstream).", correct: false, rationale: "Incorreto. Informações cruciais como pedidos e previsões de demanda fluem do cliente para o fornecedor." }, { text: "Em ambas as direções (upstream e downstream).", correct: true, rationale: "Correto! A comunicação é bidirecional: pedidos e demandas vão 'para cima' na cadeia, enquanto produtos e informações de status vão 'para baixo'." }, { text: "A informação não flui, apenas os materiais.", correct: false, rationale: "Incorreto. O fluxo de informação é tão vital quanto o fluxo de materiais." } ] },
-            { question: "A seleção e o desenvolvimento de parcerias de longo prazo com bons fornecedores são atividades centrais de qual área?", answers: [ { text: "Gestão da Produção", correct: false, rationale: "Incorreto. A gestão da produção é mais focada nos processos internos." }, { text: "Logística de Distribuição", correct: false, rationale: "Incorreto. A logística de distribuição foca na entrega ao cliente final." }, { text: "Gestão da Cadeia de Suprimentos (SCM)", correct: true, rationale: "Correto! O SCM envolve o gerenciamento estratégico das relações com todos os elos da cadeia, incluindo fornecedores." }, { text: "Controle de Qualidade", correct: false, rationale: "Incorreto. Embora a qualidade do fornecedor seja importante, a gestão da relação é uma atividade de SCM." } ] },
-            { question: "A finalidade principal da Análise da Curva ABC na gestão de estoques é:", answers: [ { text: "Calcular o custo total de transporte de todos os itens.", correct: false, rationale: "Incorreto. A Curva ABC não está relacionada a custos de transporte." }, { text: "Organizar os itens fisicamente no armazém por ordem alfabética.", correct: false, rationale: "Incorreto. O 'ABC' refere-se a uma classificação de valor, não alfabética." }, { text: "Determinar o ponto de pedido exato para cada item do estoque.", correct: false, rationale: "Incorreto. A análise ajuda a decidir o nível de controle, mas não calcula o ponto de pedido em si." }, { text: "Classificar os itens de estoque por importância, aplicando um controle mais rigoroso nos itens de maior valor.", correct: true, rationale: "Correto! A Curva ABC é uma ferramenta de priorização baseada no princípio de Pareto (80/20)." } ] },
-            { question: "Em uma loja de eletrônicos, os smartphones de última geração seriam classificados em qual categoria da Curva ABC?", answers: [ { text: "Classe A", correct: true, rationale: "Correto! Representam alto valor monetário e necessitam de controle rigoroso." }, { text: "Classe B", correct: false, rationale: "Incorreto. Itens da Classe B têm importância intermediária." }, { text: "Classe C", correct: false, rationale: "Incorreto. Itens da Classe C são de baixo valor e grande volume, como cabos e capas simples." }, { text: "Classe D", correct: false, rationale: "Incorreto. A classificação padrão é A, B e C." } ] },
-            { question: "Qual dos seguintes é um motivo válido para uma empresa manter estoques?", answers: [ { text: "Para aumentar o capital imobilizado e reduzir a liquidez.", correct: false, rationale: "Incorreto. Aumento do capital imobilizado é uma desvantagem, não um motivo." }, { text: "Para se proteger contra incertezas na demanda e no tempo de entrega.", correct: true, rationale: "Correto! O estoque de segurança atua como uma proteção contra a variabilidade, evitando a falta de produtos." }, { text: "Para ocupar o máximo de espaço possível no armazém.", correct: false, rationale: "Incorreto. Ocupar espaço gera custos; o objetivo é otimizá-lo." }, { text: "Para garantir que os produtos se tornem obsoletos.", correct: false, rationale: "Incorreto. A obsolescência é um risco e um custo do estoque, não um objetivo." } ] },
-            { question: "Um sistema de ressuprimento que dispara um novo pedido sempre que o nível de estoque atinge um ponto específico é chamado de:", answers: [ { text: "Modelo de Revisão Periódica", correct: false, rationale: "Incorreto. O modelo de revisão periódica é baseado em intervalos de tempo fixos." }, { text: "Modelo de Ponto de Pedido (ROP)", correct: true, rationale: "Correto! O gatilho para a ação neste modelo é um 'nível' ou 'ponto' de estoque." }, { text: "Curva ABC", correct: false, rationale: "Incorreto. A Curva ABC é uma ferramenta de classificação de estoque." }, { text: "Logística Reversa", correct: false, rationale: "Incorreto. Logística reversa é o fluxo de produtos do cliente para a empresa." } ] },
-            { question: "Ao escolher um modal de transporte para produtos de altíssimo valor e urgentes, qual critério é o mais importante?", answers: [ { text: "Custo", correct: false, rationale: "Incorreto. Para itens urgentes, o custo é secundário em relação à velocidade." }, { text: "Capacidade de Carga", correct: false, rationale: "Incorreto. Itens de alto valor geralmente não são transportados em grandes volumes." }, { text: "Velocidade e Confiabilidade", correct: true, rationale: "Correto! A rapidez e a certeza da entrega são essenciais para produtos urgentes ou de alto valor." }, { text: "Disponibilidade em áreas remotas", correct: false, rationale: "Incorreto. Embora seja um fator, a velocidade é o critério principal neste cenário." } ] },
-            { question: "A coordenação de todas as atividades logísticas para otimizar o fluxo de produtos é o conceito de:", answers: [ { text: "Gestão de Marketing", correct: false, rationale: "Incorreto. Marketing foca na demanda, não na entrega física." }, { text: "Logística Integrada", correct: true, rationale: "Correto! Este conceito descreve a visão sistêmica da logística, onde todas as partes trabalham juntas." }, { text: "Engenharia de Produção", correct: false, rationale: "Incorreto. Engenharia de produção foca nos processos de fabricação." }, { text: "Contabilidade de Custos", correct: false, rationale: "Incorreto. A contabilidade mede os custos, mas não gerencia as atividades." } ] },
-            { question: "Uma oficina mecânica que possui áreas separadas para troca de óleo, reparo de motores e alinhamento está organizada com qual tipo de layout?", answers: [ { text: "Layout por Produto", correct: false, rationale: "Incorreto. Cada carro (produto) recebe um serviço diferente, não seguindo uma linha única." }, { text: "Layout Posicional", correct: false, rationale: "Incorreto. O carro se move entre as estações de serviço." }, { text: "Layout por Processo (Funcional)", correct: true, rationale: "Correto! As estações de trabalho estão agrupadas por tipo de serviço ou função." }, { text: "Layout Fixo", correct: false, rationale: "Incorreto. Este é outro nome para o Layout Posicional." } ] },
-            { question: "Uma empresa estabeleceu uma meta de responder a 95% dos e-mails de clientes em até 24 horas. Ao final do mês, ela atingiu 98%. Este resultado demonstra alta:", answers: [ { text: "Eficácia", correct: true, rationale: "Correto! A empresa superou a meta estabelecida, demonstrando ser eficaz em cumprir seus objetivos." }, { text: "Eficiência", correct: false, rationale: "Incorreto. Não temos informações sobre os recursos utilizados para saber se foi eficiente." }, { text: "Produtividade", correct: false, rationale: "Incorreto. Não temos dados sobre os 'inputs' (ex: número de atendentes) para calcular a produtividade." }, { text: "Capacidade", correct: false, rationale: "Incorreto. A capacidade seria o número máximo de e-mails que eles poderiam responder, não a meta." } ] },
-            { question: "A prática de ter fornecedores entregando componentes diretamente na linha de montagem, no momento exato em que são necessários, é um princípio central do sistema:", answers: [ { text: "Just-in-Time (JIT)", correct: true, rationale: "Correto! O JIT busca eliminar estoques intermediários, sincronizando a entrega de materiais com a produção." }, { text: "Planejamento Mestre de Produção (MPS)", correct: false, rationale: "Incorreto. O MPS é uma ferramenta de planejamento de alto nível, mas não descreve essa prática específica." }, { text: "Controle Estatístico de Processo (CEP)", correct: false, rationale: "Incorreto. O CEP é uma ferramenta de controle de qualidade." }, { text: "Manutenção Preditiva", correct: false, rationale: "Incorreto. A manutenção preditiva foca em prever falhas de equipamentos." } ] },
-            { question: "A principal vantagem de um layout celular é:", answers: [ { text: "Ser o mais barato de implementar.", correct: false, rationale: "Incorreto. A implementação pode ser complexa e exigir investimento em equipamentos flexíveis." }, { text: "Maximizar a utilização de equipamentos específicos.", correct: false, rationale: "Incorreto. O layout por processo geralmente maximiza a utilização de equipamentos específicos." }, { text: "Combinar a eficiência da linha de produção com a flexibilidade do layout por processo.", correct: true, rationale: "Correto! Ele oferece um bom equilíbrio, permitindo a produção eficiente de famílias de produtos variados." }, { text: "Ser ideal para produtos que não podem ser movidos.", correct: false, rationale: "Incorreto. Esse é o layout posicional." } ] },
-            { question: "O que é o 'Efeito Chicote' (Bullwhip Effect) na cadeia de suprimentos?", answers: [ { text: "O aumento da eficiência à medida que os produtos se aproximam do cliente final.", correct: false, rationale: "Incorreto. O efeito chicote geralmente descreve um problema de ineficiência." }, { text: "A redução dos custos de transporte devido à consolidação de cargas.", correct: false, rationale: "Incorreto. Isso é um objetivo da logística, não o Efeito Chicote." }, { text: "A tendência de pequenas variações na demanda do cliente final se amplificarem à medida que se movem para trás na cadeia de suprimentos.", correct: true, rationale: "Correto! Isso leva a grandes oscilações nos pedidos de estoque e produção para fornecedores e fabricantes." }, { text: "A melhoria contínua dos processos em toda a cadeia de suprimentos.", correct: false, rationale: "Incorreto. A melhoria contínua é um objetivo, enquanto o Efeito Chicote é um problema a ser resolvido." } ] },
-            { question: "Em uma análise de produtividade, se a produção de uma fábrica aumentou 10% enquanto as horas trabalhadas aumentaram 5%, pode-se afirmar que:", answers: [ { text: "A produtividade da mão de obra diminuiu.", correct: false, rationale: "Incorreto. A produção cresceu mais do que o recurso utilizado." }, { text: "A produtividade da mão de obra permaneceu a mesma.", correct: false, rationale: "Incorreto. As taxas de crescimento são diferentes." }, { text: "A produtividade da mão de obra aumentou.", correct: true, rationale: "Correto! Como o aumento nas saídas (10%) foi maior que o aumento na entrada (5%), a razão entre eles (produtividade) aumentou." }, { text: "Não há dados suficientes para analisar a produtividade.", correct: false, rationale: "Incorreto. Temos os dados percentuais necessários para essa análise comparativa." } ] },
-            { question: "Qual dos seguintes é considerado um CUSTO de manutenção de estoque?", answers: [ { text: "Custo de transporte do fornecedor para o armazém.", correct: false, rationale: "Isso é um custo de aquisição ou de pedido, não de manutenção." }, { text: "Custo de oportunidade do capital empatado nos produtos.", correct: true, rationale: "Correto! O dinheiro preso em estoque poderia estar rendendo juros ou sendo investido em outro lugar, gerando um custo de oportunidade." }, { text: "Salário do gerente de compras.", correct: false, rationale: "Isso é um custo administrativo ou de aquisição, não diretamente ligado à manutenção do estoque." }, { text: "Desconto por volume obtido na compra.", correct: false, rationale: "Isso é um benefício da compra, que pode levar a um aumento de estoque, mas não é um custo de mantê-lo." } ] },
-            { question: "Para uma empresa que fabrica produtos de alto volume e baixa variedade, como parafusos, a decisão estratégica de localização será mais influenciada por:", answers: [ { text: "Proximidade de universidades e centros de pesquisa.", correct: false, rationale: "Isso é mais crítico para indústrias de alta tecnologia ou P&D." }, { text: "Custos de mão de obra, logística e matéria-prima.", correct: true, rationale: "Correto! Em mercados de commodities e alto volume, a minimização dos custos é o fator dominante para a competitividade." }, { text: "Proximidade de lojas de varejo de luxo.", correct: false, rationale: "A localização de varejo de luxo é irrelevante para uma fábrica de parafusos." }, { text: "Facilidade de acesso para clientes finais visitarem a fábrica.", correct: false, rationale: "Indústrias B2B de alto volume raramente precisam se preocupar com o acesso de clientes finais à sua planta." } ] },
-            { question: "O processo de devolução de produtos por clientes, seja por defeito ou fim de vida útil, é gerenciado pela:", answers: [ { text: "Logística de Entrada (Inbound Logistics)", correct: false, rationale: "Incorreto. Logística de entrada lida com o recebimento de materiais dos fornecedores." }, { text: "Logística Reversa", correct: true, rationale: "Correto! A logística reversa gerencia o fluxo de produtos no sentido contrário ao tradicional, do consumidor de volta para a empresa." }, { text: "Gestão de Inventário", correct: false, rationale: "Incorreto. A gestão de inventário lida com o estoque, mas a logística reversa é o processo específico de retorno." }, { text: "Gestão de Compras", correct: false, rationale: "Incorreto. Compras trata da aquisição de novos materiais e serviços." } ] },
-            { question: "Uma empresa decide parar de fabricar um componente e passar a comprá-lo de um fornecedor especializado. Esta é uma decisão de:", answers: [ { text: "Layout", correct: false, rationale: "Incorreto. Layout refere-se ao arranjo físico interno." }, { text: "Terceirização (Outsourcing)", correct: true, rationale: "Correto! Terceirização é o ato de contratar uma empresa externa para realizar tarefas que antes eram feitas internamente." }, { text: "Integração Vertical", correct: false, rationale: "Incorreto. Integração vertical é o oposto, é quando a empresa decide produzir internamente o que antes comprava." }, { text: "Benchmarking", correct: false, rationale: "Incorreto. Benchmarking é o processo de comparar suas práticas com as dos melhores do mercado." } ] }
-        ];
+          if (isCorrectAnswer) {
+            return 'bg-green-500/80 border-green-400 text-white cursor-not-allowed';
+          }
+          if (isSelectedAnswer && !isCorrect) {
+            return 'bg-red-500/80 border-red-400 text-white cursor-not-allowed';
+          }
+          
+          return 'bg-gray-700/50 border-gray-600 cursor-not-allowed text-gray-400';
+        };
 
-        const questionElement = document.getElementById('question');
-        const answerButtonsElement = document.getElementById('answer-buttons');
-        const nextButton = document.getElementById('next-btn');
-        const quizContainer = document.getElementById('quiz-container');
-        const scoreContainer = document.getElementById('score-container');
-        const scoreText = document.getElementById('score-text');
-        const restartButton = document.getElementById('restart-btn');
-        const progressText = document.getElementById('progress-text');
-        
-        let shuffledQuestions, currentQuestionIndex, score;
+        return (
+          <div className="w-full space-y-6">
+            <h2 className="text-xl md:text-2xl font-semibold text-center text-gray-100">
+              {question.questionText}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {question.options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => onAnswerSelect(index)}
+                  disabled={isAnswered}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all duration-300 ${getButtonClass(index)}`}
+                >
+                  <span className="font-medium">{option}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      };
 
-        function startGame() {
-            shuffledQuestions = questions.sort(() => Math.random() - 0.5);
-            currentQuestionIndex = 0;
-            score = 0;
-            scoreContainer.classList.add('hide');
-            quizContainer.classList.remove('hide');
-            nextButton.classList.add('hide');
-            setNextQuestion();
+      // Component from components/ScoreScreen.tsx
+      const ScoreScreen = ({ score, totalQuestions, onRestart }) => {
+        const percentage = Math.round((score / totalQuestions) * 100);
+        let message = '';
+        let icon = '';
+
+        if (percentage >= 80) {
+          message = 'Excelente! Você domina a Gestão de Operações!';
+          icon = 'fa-trophy text-yellow-400';
+        } else if (percentage >= 50) {
+          message = 'Bom trabalho! Continue estudando para aprimorar.';
+          icon = 'fa-thumbs-up text-green-400';
+        } else {
+          message = 'Não desanime! A revisão é o caminho para o sucesso.';
+          icon = 'fa-book-open text-blue-400';
         }
 
-        function setNextQuestion() {
-            resetState();
-            showQuestion(shuffledQuestions[currentQuestionIndex]);
-        }
+        return (
+          <div className="flex flex-col items-center justify-center text-center space-y-6 py-8">
+            <i className={`fas ${icon} text-6xl`}></i>
+            <h2 className="text-3xl font-bold text-cyan-400">Quiz Finalizado!</h2>
+            <p className="text-xl text-gray-300">
+              Você acertou <span className="font-bold text-white">{score}</span> de{' '}
+              <span className="font-bold text-white">{totalQuestions}</span> perguntas.
+            </p>
+            <p className="text-5xl font-bold text-white">{percentage}%</p>
+            <p className="text-lg italic text-gray-400">{message}</p>
+            <button
+              onClick={onRestart}
+              className="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-75"
+            >
+              <i className="fas fa-redo mr-2"></i>
+              Tentar Novamente
+            </button>
+          </div>
+        );
+      };
 
-        function showQuestion(question) {
-            progressText.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
-            questionElement.innerText = question.question;
-            question.answers.forEach(answer => {
-                const button = document.createElement('button');
-                button.innerText = answer.text;
-                button.classList.add('btn');
-                if (answer.correct) {
-                    button.dataset.correct = answer.correct;
-                }
-                button.dataset.rationale = answer.rationale;
-                button.addEventListener('click', selectAnswer);
-                answerButtonsElement.appendChild(button);
-            });
-        }
+      // Main App component from App.tsx
+      const App = () => {
+        const [questions, setQuestions] = useState(() => [...QUIZ_QUESTIONS].sort(() => Math.random() - 0.5));
+        const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+        const [score, setScore] = useState(0);
+        const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
+        const [isAnswered, setIsAnswered] = useState(false);
+        const [quizFinished, setQuizFinished] = useState(false);
 
-        function resetState() {
-            clearStatusClass(document.body);
-            nextButton.classList.add('hide');
-            while (answerButtonsElement.firstChild) {
-                answerButtonsElement.removeChild(answerButtonsElement.firstChild);
-            }
-        }
+        const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
+        const isCorrect = selectedAnswerIndex === currentQuestion?.correctAnswerIndex;
 
-        function selectAnswer(e) {
-            const selectedButton = e.target;
-            const correct = selectedButton.dataset.correct === "true";
+        const handleAnswerSelect = (answerIndex) => {
+          if (isAnswered) return;
 
-            if (correct) {
-                score++;
-            }
+          setSelectedAnswerIndex(answerIndex);
+          setIsAnswered(true);
+          if (answerIndex === currentQuestion.correctAnswerIndex) {
+            setScore(prevScore => prevScore + 1);
+          }
+        };
 
-            Array.from(answerButtonsElement.children).forEach(button => {
-                setStatusClass(button, button.dataset.correct === "true");
-                button.disabled = true;
-                const rationaleText = document.createElement('span');
-                rationaleText.classList.add('rationale');
-                rationaleText.innerText = button.dataset.rationale;
-                button.appendChild(rationaleText);
-            });
+        const handleNextQuestion = () => {
+          if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+            setSelectedAnswerIndex(null);
+            setIsAnswered(false);
+          } else {
+            setQuizFinished(true);
+          }
+        };
 
-            if (shuffledQuestions.length > currentQuestionIndex + 1) {
-                nextButton.classList.remove('hide');
-            } else {
-                showScore();
-            }
-        }
+        const handleRestartQuiz = () => {
+          setQuestions([...QUIZ_QUESTIONS].sort(() => Math.random() - 0.5));
+          setCurrentQuestionIndex(0);
+          setScore(0);
+          setSelectedAnswerIndex(null);
+          setIsAnswered(false);
+          setQuizFinished(false);
+        };
 
-        function setStatusClass(element, correct) {
-            clearStatusClass(element);
-            if (correct) {
-                element.classList.add('correct');
-            } else {
-                element.classList.add('wrong');
-            }
-        }
+        return (
+          <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 font-sans">
+            <div className="w-full max-w-2xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
+              <h1 className="text-3xl md:text-4xl font-bold text-center text-cyan-400">Revisão de Gestão Integradora de Operações</h1>
+              
+              {quizFinished ? (
+                <ScoreScreen score={score} totalQuestions={questions.length} onRestart={handleRestartQuiz} />
+              ) : (
+                <>
+                  <ProgressBar current={currentQuestionIndex + 1} total={questions.length} />
+                  <QuestionCard 
+                    question={currentQuestion}
+                    selectedAnswerIndex={selectedAnswerIndex}
+                    isAnswered={isAnswered}
+                    isCorrect={isCorrect}
+                    onAnswerSelect={handleAnswerSelect}
+                  />
 
-        function clearStatusClass(element) {
-            element.classList.remove('correct');
-            element.classList.remove('wrong');
-        }
-
-        function handleNextButtonClick() {
-            currentQuestionIndex++;
-            setNextQuestion();
-        }
-
-        function showScore() {
-            quizContainer.classList.add('hide');
-            nextButton.classList.add('hide');
-            scoreContainer.classList.remove('hide');
-            const percentage = Math.round((score / questions.length) * 100);
-            scoreText.innerHTML = `Você acertou ${score} de ${questions.length} perguntas! (${percentage}%)`;
-        }
-        
-        nextButton.addEventListener('click', handleNextButtonClick);
-        restartButton.addEventListener('click', startGame);
-
-        startGame();
+                  {isAnswered && (
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className={`w-full p-4 rounded-lg ${isCorrect ? 'bg-green-900/50 border-green-500' : 'bg-red-900/50 border-red-500'} border`}>
+                        <p className="font-bold text-lg mb-2">{isCorrect ? 'Resposta Correta!' : 'Resposta Incorreta!'}</p>
+                        <p className="text-gray-300">{currentQuestion.explanation}</p>
+                      </div>
+                      <button
+                        onClick={handleNextQuestion}
+                        className="w-full md:w-auto px-8 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-75"
+                      >
+                        {currentQuestionIndex < questions.length - 1 ? 'Próxima Pergunta' : 'Ver Resultado'}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <footer className="text-center mt-8 text-gray-500 text-sm">
+              <p>Desenvolvido para fins educacionais.</p>
+            </footer>
+          </div>
+        );
+      };
+      
+      // Rendering logic from index.tsx
+      const rootElement = document.getElementById('root');
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
     </script>
-
-</body>
+  </body>
 </html>
